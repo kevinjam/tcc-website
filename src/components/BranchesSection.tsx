@@ -1,18 +1,31 @@
-import React, { useState } from 'react';
-import { MapPin, Phone, Mail, Clock, Calendar, Bookmark, Landmark, ChevronRight, MessageSquare } from 'lucide-react';
+import React from 'react';
+import { MapPin, Phone, Mail, Landmark, MessageCircle, Laptop } from 'lucide-react';
 import { Branch, Program } from '../types';
+import { CHURCH_CONTACT } from '../contactInfo';
 
 interface BranchesSectionProps {
   branches: Branch[];
   programs: Program[];
 }
 
-export default function BranchesSection({ branches, programs }: BranchesSectionProps) {
-  const [selectedBranchId, setSelectedBranchId] = useState<string | null>(null);
+const DAY_ORDER = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-  // Split programs into Sunday vs Mid-week
-  const sundayPrograms = programs.filter(p => p.day === 'Sunday');
-  const weekdayPrograms = programs.filter(p => p.day !== 'Sunday');
+const DAY_ACCENT: Record<string, string> = {
+  Sunday: 'border-l-violet-500',
+  Monday: 'border-l-sky-500',
+  Tuesday: 'border-l-rose-700',
+  Wednesday: 'border-l-blue-500',
+  Thursday: 'border-l-emerald-500',
+  Friday: 'border-l-indigo-500',
+  Saturday: 'border-l-orange-500',
+};
+
+export default function BranchesSection({ branches, programs }: BranchesSectionProps) {
+  const sortedPrograms = [...programs].sort((a, b) => {
+    const dayDiff = DAY_ORDER.indexOf(a.day) - DAY_ORDER.indexOf(b.day);
+    if (dayDiff !== 0) return dayDiff;
+    return a.time.localeCompare(b.time);
+  });
 
   return (
     <div className="bg-slate-50 min-h-screen font-sans text-slate-800">
@@ -23,12 +36,11 @@ export default function BranchesSection({ branches, programs }: BranchesSectionP
         <div className="relative z-10 max-w-4xl mx-auto px-6 space-y-3">
           <span className="text-xs uppercase tracking-widest text-gold-400 font-bold font-heading">Connect Locally</span>
           <h2 className="font-display text-3xl font-bold tracking-tight md:text-5xl">
-            Our Branches &amp; Weekly Altars
+            Our Branches &amp; Weekly Programme
           </h2>
           <p className="text-slate-400 text-sm max-w-2xl mx-auto leading-relaxed">
-            Trinity Christian Church aims to establish self-governing, self-propagating, and self-supporting
-            local churches across Uganda under the supervision of the main branch — in fulfilment of
-            Christ&apos;s command to preach the Gospel to every creature (Mark 16:15; Matthew 28:19).
+            We warmly welcome you, your family, and friends to worship, fellowship, and grow in the
+            knowledge of our Lord Jesus Christ through our weekly services and ministry programmes.
           </p>
         </div>
       </section>
@@ -124,73 +136,102 @@ export default function BranchesSection({ branches, programs }: BranchesSectionP
         </div>
       </section>
 
-      {/* Weekly Programs (Altars) Schedule */}
+      {/* Weekly Programme */}
       <section className="bg-slate-900 text-white py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-gold-400 font-heading">Our Service Schedule</span>
+          <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
+            <span className="text-xs font-bold uppercase tracking-widest text-gold-400 font-heading">Weekly Programme</span>
             <h3 className="font-heading text-2xl font-bold tracking-tight md:text-4xl">
-              Weekly Altars &amp; Fellowships
+              Worship • Grow • Serve • Impact
             </h3>
-            <p className="text-slate-400 text-xs">
-              Never miss an opportunity to seek the presence of God. Mark these weekly programs on your calendar.
+            <p className="text-slate-400 text-sm leading-relaxed">
+              Join us throughout the week for worship, fellowship, prayer, and Radio TCC broadcasts.
+              Everyone is welcome.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-            
-            {/* Column A: Sunday Glory Services */}
-            <div className="space-y-6">
-              <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
-                <Calendar className="h-5 w-5 text-gold-400" />
-                <h4 className="font-heading font-bold text-lg text-white">Sunday Worship Services</h4>
-              </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {sortedPrograms.map((prg) => (
+              <article
+                key={prg.id}
+                className={`rounded-xl bg-slate-950 border border-slate-800 border-l-4 p-5 space-y-2.5 ${DAY_ACCENT[prg.day] || 'border-l-gold-500'}`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-gold-400 font-heading">
+                    {prg.day}
+                  </span>
+                  <span className="text-[10px] font-semibold text-slate-400 shrink-0">
+                    {prg.time}
+                  </span>
+                </div>
+                <h4 className="font-heading font-bold text-sm text-white leading-snug">{prg.name}</h4>
+                <p className="text-slate-400 text-xs leading-relaxed">{prg.description}</p>
+                <div className="flex items-center text-[10px] text-slate-500 pt-1">
+                  <MapPin className="mr-1 h-3 w-3 shrink-0" />
+                  <span>{prg.location || 'Main Sanctuary, Rubaga Road'}</span>
+                </div>
+              </article>
+            ))}
+          </div>
 
-              <div className="space-y-4">
-                {sundayPrograms.map((prg) => (
-                  <div key={prg.id} className="rounded-xl bg-slate-950 p-5 border border-slate-800 flex flex-col justify-between">
-                    <div className="flex items-start justify-between">
-                      <h5 className="font-heading font-bold text-sm text-gold-400">{prg.name}</h5>
-                      <span className="rounded bg-gold-500/10 border border-gold-500/20 px-2 py-0.5 text-[9px] font-bold text-gold-400 uppercase">
-                        {prg.time}
-                      </span>
-                    </div>
-                    <p className="text-slate-300 text-xs mt-2.5 leading-relaxed">{prg.description}</p>
-                    <div className="mt-4 flex items-center text-[10px] text-slate-500 font-medium">
-                      <MapPin className="mr-1 h-3.5 w-3.5" />
-                      <span>Location: {prg.location || 'Main Sanctuary'}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+          <p className="mt-10 text-center text-slate-500 text-xs max-w-xl mx-auto leading-relaxed">
+            Come and experience God&apos;s love, the power of His Word, heartfelt worship, and genuine
+            fellowship — where lives are transformed through Jesus Christ.
+          </p>
+        </div>
+      </section>
 
-            {/* Column B: Mid-week Devotional Altars */}
-            <div className="space-y-6">
-              <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
-                <Clock className="h-5 w-5 text-gold-400" />
-                <h4 className="font-heading font-bold text-lg text-white">Mid-Week Altars &amp; Overnights</h4>
-              </div>
+      {/* Stay Connected: WhatsApp + ICT Hub */}
+      <section className="bg-slate-50 py-16 md:py-20 border-t border-slate-200">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center max-w-2xl mx-auto mb-10 space-y-3">
+            <span className="text-xs font-bold uppercase tracking-widest text-gold-600 font-heading">Stay Connected</span>
+            <h3 className="font-heading text-2xl font-bold text-slate-900 md:text-3xl">
+              WhatsApp Channel &amp; ICT Hub
+            </h3>
+            <p className="text-slate-500 text-sm leading-relaxed">
+              Follow announcements wherever you are, and serve God through technology with the TCC ICT Hub.
+            </p>
+          </div>
 
-              <div className="space-y-4">
-                {weekdayPrograms.map((prg) => (
-                  <div key={prg.id} className="rounded-xl bg-slate-950 p-5 border border-slate-800 flex flex-col justify-between">
-                    <div className="flex items-start justify-between">
-                      <h5 className="font-heading font-bold text-sm text-slate-200">{prg.name}</h5>
-                      <span className="rounded bg-slate-800 px-2 py-0.5 text-[9px] font-bold text-slate-300 uppercase shrink-0 ml-2">
-                        {prg.day} | {prg.time}
-                      </span>
-                    </div>
-                    <p className="text-slate-300 text-xs mt-2.5 leading-relaxed">{prg.description}</p>
-                    <div className="mt-4 flex items-center text-[10px] text-slate-500 font-medium">
-                      <MapPin className="mr-1 h-3.5 w-3.5" />
-                      <span>Location: {prg.location || 'Main Sanctuary'}</span>
-                    </div>
-                  </div>
-                ))}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 max-w-4xl mx-auto">
+            <a
+              href={CHURCH_CONTACT.whatsappChannelUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:border-emerald-400 hover:shadow-md transition-all space-y-3"
+            >
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 group-hover:bg-emerald-100 transition-colors">
+                <MessageCircle className="h-5 w-5" />
               </div>
-            </div>
+              <h4 className="font-heading font-bold text-base text-slate-900">Official WhatsApp Channel</h4>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Receive church announcements, daily inspirational messages, sermon highlights, upcoming
+                events, prayer updates, and Radio TCC &amp; TV TCC news.
+              </p>
+              <span className="inline-flex items-center text-xs font-bold text-emerald-700 group-hover:underline">
+                Follow the channel →
+              </span>
+            </a>
 
+            <a
+              href={CHURCH_CONTACT.ictHubWhatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:border-gold-400 hover:shadow-md transition-all space-y-3"
+            >
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gold-50 text-gold-700 border border-gold-100 group-hover:bg-gold-100 transition-colors">
+                <Laptop className="h-5 w-5" />
+              </div>
+              <h4 className="font-heading font-bold text-base text-slate-900">Join the TCC ICT Hub</h4>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Learn, grow, and serve through tech — website development, live streaming, graphic design,
+                radio broadcasting, cybersecurity, and digital ministry. Beginners and professionals welcome.
+              </p>
+              <span className="inline-flex items-center text-xs font-bold text-gold-700 group-hover:underline">
+                Join on WhatsApp →
+              </span>
+            </a>
           </div>
         </div>
       </section>

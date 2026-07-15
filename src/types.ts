@@ -24,7 +24,7 @@ export interface GalleryItem {
   id: string;
   url: string;
   title: string;
-  category: 'Worship' | 'Youth' | 'Brigade' | 'Community' | 'Outreach';
+  category: 'Worship' | 'Youth' | 'Brigade' | 'Community' | 'Outreach' | 'Media';
   date: string;
 }
 

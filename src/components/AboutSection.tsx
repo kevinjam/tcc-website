@@ -37,22 +37,25 @@ export default function AboutSection({ churchInfo, setCurrentTab }: AboutSection
 
   const leaders = [
     {
-      name: "Senior Bishop John Mukisa",
-      role: "Founder & Spiritual Director",
-      bio: "Bishop John Mukisa has been in active ministry for over 35 years. Birthed with an apostolic commission, he coordinates TCC regional networks and oversees the Voice of the Gospel Radio program, bringing healing to thousands across East Africa.",
-      imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400"
+      name: "Prophet Israel",
+      role: "Vision Bearer",
+      bio: "A devoted servant of God called to prayer, prophecy, and the proclamation of the Gospel. His heart is to see lives transformed and people walking in God's purpose.",
+      scripture: "Psalm 23:1",
+      imageUrl: "/pastors/prophet-israel.png"
     },
     {
-      name: "Reverend Sarah Mukisa",
-      role: "Co-Founder & Director of Women's Ministries",
-      bio: "Reverend Sarah Mukisa co-founded TCC and directs the 'Sisters of Grace' women fellowship. She is an ordained counselor who works directly with marital support, orphan aids, and directs local church developmental projects.",
-      imageUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400"
+      name: "Apostle Enock",
+      role: "Apostolic Ministry",
+      bio: "An apostle called to equip the Church, raise leaders, and establish strong foundations in the body of Christ. His passion is discipleship, unity, and advancing God's Kingdom through the Great Commission.",
+      scripture: "Matthew 28:19",
+      imageUrl: "/pastors/apostle-enock.png"
     },
     {
-      name: "Pastor David Serwadda",
-      role: "Regional Overseer & Pastor (Mukono)",
-      bio: "Pastor David has served in the TCC leadership team for 12 years. He is currently the head pastor of Mukono Branch and organizes regional outreaches and the annual Youth & Brigade national camps.",
-      imageUrl: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?q=80&w=400"
+      name: "Pastor Omoding",
+      role: "Church Pastor",
+      bio: "A faithful pastor dedicated to shepherding God's people through teaching, prayer, and care. His desire is to see believers grow in faith and live Christ-centered lives that honor God.",
+      scripture: "1 Peter 5:2",
+      imageUrl: "/pastors/pastor-omoding.png"
     }
   ];
 
@@ -126,14 +129,13 @@ export default function AboutSection({ churchInfo, setCurrentTab }: AboutSection
         <div className="lg:col-span-5 relative">
           <div className="absolute inset-0 bg-gradient-to-tr from-gold-500/10 to-transparent rounded-2xl"></div>
           <img 
-            src="https://images.unsplash.com/photo-1531844251246-9a1bfaae0d76?q=80&w=800" 
-            alt="Bishop John Mukisa preaching" 
+            src="/voice-rubaga.png" 
+            alt="Trinity Christian Church leadership" 
             className="rounded-2xl object-cover h-[380px] w-full shadow-lg border border-slate-200"
-            referrerPolicy="no-referrer"
           />
           <div className="absolute bottom-6 left-6 right-6 bg-slate-950/95 border border-slate-800 text-white rounded-xl p-5 shadow-2xl backdrop-blur-md">
-            <h4 className="font-heading font-bold text-sm text-gold-400">Bishop John preaching on Radio TCC</h4>
-            <p className="text-slate-400 text-xs mt-1">Broadcasting the Voice of the Gospel across Rubaga, Makindye, Mukono, and Wakiso Districts.</p>
+            <h4 className="font-heading font-bold text-sm text-gold-400">Transforming Lives Through the Word of God</h4>
+            <p className="text-slate-400 text-xs mt-1">Prophet Israel · Apostle Enock · Pastor Omoding — serving Trinity Christian Church on Rubaga Road.</p>
           </div>
         </div>
 
@@ -178,7 +180,7 @@ export default function AboutSection({ churchInfo, setCurrentTab }: AboutSection
           </h3>
           <div className="h-1 w-12 bg-gold-500 mx-auto"></div>
           <p className="text-slate-500 text-xs">
-            Meet the faithful pastors and leadership team dedicated to discipling and caring for families at TCC.
+            Transforming lives through the Word of God — meet the shepherds serving Trinity Christian Church.
           </p>
         </div>
 
@@ -189,12 +191,11 @@ export default function AboutSection({ churchInfo, setCurrentTab }: AboutSection
               key={idx} 
               className="rounded-2xl bg-white border border-slate-100 shadow-sm overflow-hidden hover:shadow-md transition-all flex flex-col"
             >
-              <div className="h-[260px] bg-slate-100 relative">
+              <div className="h-[280px] bg-slate-100 relative">
                 <img 
                   src={leader.imageUrl} 
                   alt={leader.name} 
-                  className="h-full w-full object-cover grayscale brightness-95"
-                  referrerPolicy="no-referrer"
+                  className="h-full w-full object-cover object-top"
                 />
                 <div className="absolute bottom-4 left-4 rounded bg-gold-500 px-3 py-1 font-heading text-xs font-bold text-slate-950">
                   {leader.role}
@@ -204,6 +205,9 @@ export default function AboutSection({ churchInfo, setCurrentTab }: AboutSection
                 <div>
                   <h4 className="font-heading font-bold text-lg text-slate-900">{leader.name}</h4>
                   <p className="text-xs text-slate-600 mt-2 leading-relaxed">{leader.bio}</p>
+                  <p className="mt-3 font-heading text-[11px] font-bold uppercase tracking-wider text-gold-600">
+                    {leader.scripture}
+                  </p>
                 </div>
                 <button
                   onClick={() => setCurrentTab('contact')}

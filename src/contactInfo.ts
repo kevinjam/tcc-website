@@ -20,6 +20,8 @@ export const CHURCH_CONTACT = {
   ],
   primaryEmail: 'info@trinitychristianchurch.org.ug',
   facebookUrl: 'https://www.facebook.com/tccrubagaroad',
+  whatsappChannelUrl: 'https://whatsapp.com/channel/0029Vb7Eq33IN9ijt1A1cs1c',
+  ictHubWhatsappUrl: 'https://chat.whatsapp.com/BpUCBnvgi508q88PhlpGVo',
 } as const;
 
 /** Official Radio TCC stream + public player site */

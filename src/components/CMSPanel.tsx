@@ -911,6 +911,7 @@ export default function CMSPanel({
                       <option value="Brigade">Brigade</option>
                       <option value="Community">Community</option>
                       <option value="Outreach">Outreach</option>
+                      <option value="Media">Media</option>
                     </select>
                   </div>
                 </div>

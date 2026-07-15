@@ -23,6 +23,26 @@ if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
 }
 
+// Ensure submissions file exists for contact form + admin inbox
+if (!fs.existsSync(SUBMISSIONS_PATH)) {
+  fs.writeFileSync(SUBMISSIONS_PATH, JSON.stringify([], null, 2));
+}
+
+function readSubmissions(): any[] {
+  try {
+    if (!fs.existsSync(SUBMISSIONS_PATH)) return [];
+    const raw = fs.readFileSync(SUBMISSIONS_PATH, 'utf-8');
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeSubmissions(submissions: any[]): void {
+  fs.writeFileSync(SUBMISSIONS_PATH, JSON.stringify(submissions, null, 2));
+}
+
 // Lazy load Gemini AI Client
 let aiClient: GoogleGenAI | null = null;
 function getAiClient(): GoogleGenAI | null {
@@ -187,66 +207,175 @@ const getInitialDefaultState = () => {
     programs: [
       {
         id: "prg-1",
-        name: "Sunday Glory Service (Luganda Service)",
+        name: "Main Worship Service",
         day: "Sunday",
-        time: "08:00 AM - 10:30 AM",
-        description: "Traditional Luganda praise, preaching, and dynamic choir ministry.",
-        location: "Main Sanctuary"
+        time: "6:30 AM onwards",
+        description: "A powerful worship experience filled with heartfelt praise and worship, fervent prayer, inspiring testimonies, life-transforming biblical teaching, and fellowship with believers. Come expecting God's presence, healing, restoration, and spiritual renewal.",
+        location: "Main Sanctuary, Rubaga Road"
       },
       {
         id: "prg-2",
-        name: "Sunday Celebration Service (English Service)",
-        day: "Sunday",
-        time: "10:45 AM - 01:15 PM",
-        description: "Contemporary English worship, biblical exposition, and family blessings.",
-        location: "Main Sanctuary & TV Streamed"
+        name: "Radio TCC Programmes",
+        day: "Monday",
+        time: "Throughout the day",
+        description: "Inspiring messages, biblical teachings, worship music, prayer sessions, and encouraging discussions on Radio TCC. Tune in and be spiritually refreshed.",
+        location: "Radio TCC / radio.tccug.org"
       },
       {
         id: "prg-3",
-        name: "Sunday Evening Revival & Deliverance",
-        day: "Sunday",
-        time: "04:30 PM - 07:00 PM",
-        description: "Deep prayers, testimonies, apostolic laying of hands, and worship.",
-        location: "Main Sanctuary"
+        name: "Women's Fellowship",
+        day: "Tuesday",
+        time: "9:00 AM – 2:00 PM",
+        description: "A special fellowship for women providing worship, prayer, Bible study, mentorship, counseling, and spiritual empowerment. Grow in faith, strengthen family values, and support one another in Christian living.",
+        location: "Main Sanctuary, Rubaga Road"
       },
       {
         id: "prg-4",
-        name: "Wednesday Mid-Week Power Altars",
+        name: "Radio TCC Programmes",
         day: "Wednesday",
-        time: "05:00 PM - 07:30 PM",
-        description: "Bible study exposition followed by aggressive prayer and intercession.",
-        location: "Main Sanctuary"
+        time: "Throughout the day",
+        description: "Midweek encouragement through God's Word, worship, testimonies, inspirational teachings, and gospel music designed to strengthen your faith and keep you connected to Christ.",
+        location: "Radio TCC / radio.tccug.org"
       },
       {
         id: "prg-5",
-        name: "Friday Intercessory Overnight Prayer",
+        name: "Men's Fellowship",
+        day: "Thursday",
+        time: "4:00 PM – 5:00 PM",
+        description: "Men gather for prayer, Bible study, mentorship, leadership development, and encouragement to become faithful Christian leaders in their homes, workplaces, communities, and the Church.",
+        location: "Main Sanctuary, Rubaga Road"
+      },
+      {
+        id: "prg-6",
+        name: "Youth Service",
+        day: "Thursday",
+        time: "5:00 PM – 8:00 PM",
+        description: "An energetic, Spirit-filled service for young people — vibrant praise and worship, biblical teaching, prayer, fellowship, mentorship, and activities that inspire youth to live boldly for Christ.",
+        location: "Main Sanctuary, Rubaga Road"
+      },
+      {
+        id: "prg-7",
+        name: "Breaking Yokes Prayer Service",
         day: "Friday",
-        time: "10:00 PM - 05:00 AM",
-        location: "Main Sanctuary",
-        description: "Full overnight seeking the face of God."
+        time: "12:00 PM – 2:00 PM",
+        description: "A powerful intercessory prayer service where burdens are lifted, chains are broken, and believers experience God's deliverance, healing, restoration, and breakthrough.",
+        location: "Main Sanctuary, Rubaga Road"
+      },
+      {
+        id: "prg-8",
+        name: "Radio TCC Live Programmes",
+        day: "Friday",
+        time: "4:00 PM – 11:00 PM",
+        description: "Inspirational preaching, gospel music, live discussions, testimonies, prayer sessions, interviews, and special broadcasts on Radio TCC as we prepare our hearts for the weekend.",
+        location: "Radio TCC / radio.tccug.org"
+      },
+      {
+        id: "prg-9",
+        name: "Children's Service",
+        day: "Saturday",
+        time: "12:00 PM",
+        description: "A special service nurturing children in the love, knowledge, and fear of the Lord through Bible lessons, worship, songs, games, and interactive activities.",
+        location: "Main Sanctuary, Rubaga Road"
       }
     ],
     gallery: [
       {
         id: "gal-1",
-        url: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?q=80&w=800",
-        title: "Praise & Worship Team leading the Sunday Glory service",
+        url: "/media/01.png",
+        title: "Ministry leaders sharing at the Sunday service",
         category: "Worship",
-        date: "2026-06-21"
+        date: "2026-06-08"
       },
       {
         id: "gal-2",
-        url: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=800",
-        title: "Youth fellowship sharing testimonies in the gardens",
-        category: "Youth",
-        date: "2026-06-27"
+        url: "/media/02.png",
+        title: "The Word proclaimed from the Rubaga Road pulpit",
+        category: "Worship",
+        date: "2026-06-15"
       },
       {
         id: "gal-3",
-        url: "https://images.unsplash.com/photo-1573152958734-1922c188fba3?q=80&w=800",
-        title: "The Boys' Brigade Brass Band performance on Easter Sunday",
-        category: "Brigade",
-        date: "2026-04-12"
+        url: "/media/03.png",
+        title: "Sisters in ministry leading with passion",
+        category: "Worship",
+        date: "2026-06-22"
+      },
+      {
+        id: "gal-4",
+        url: "/media/04.png",
+        title: "Worship and teaching at Trinity Christian Church",
+        category: "Worship",
+        date: "2026-06-29"
+      },
+      {
+        id: "gal-5",
+        url: "/media/05.png",
+        title: "Pastoral leadership declaring the Word of God",
+        category: "Worship",
+        date: "2026-07-01"
+      },
+      {
+        id: "gal-6",
+        url: "/media/06.png",
+        title: "A Spirit-filled moment during the main service",
+        category: "Worship",
+        date: "2026-07-05"
+      },
+      {
+        id: "gal-7",
+        url: "/media/07.png",
+        title: "Praise & worship before the cross pulpit",
+        category: "Worship",
+        date: "2026-07-06"
+      },
+      {
+        id: "gal-8",
+        url: "/media/08.png",
+        title: "Congregation gathered in the presence of God",
+        category: "Community",
+        date: "2026-07-07"
+      },
+      {
+        id: "gal-9",
+        url: "/media/09.png",
+        title: "Fellowship and faith in action",
+        category: "Community",
+        date: "2026-07-08"
+      },
+      {
+        id: "gal-10",
+        url: "/media/10.png",
+        title: "Worship broadcast from TCC Rubaga Road",
+        category: "Media",
+        date: "2026-07-09"
+      },
+      {
+        id: "gal-11",
+        url: "/media/11.png",
+        title: "Sunday celebration captured live",
+        category: "Worship",
+        date: "2026-07-10"
+      },
+      {
+        id: "gal-12",
+        url: "/media/12.png",
+        title: "The Great Banquet — Live on Radio TCC",
+        category: "Media",
+        date: "2026-07-11"
+      },
+      {
+        id: "gal-13",
+        url: "/media/13.png",
+        title: "Radio TCC Voices of the Gospel studio session",
+        category: "Media",
+        date: "2026-07-12"
+      },
+      {
+        id: "gal-14",
+        url: "/media/14.png",
+        title: "Ekondere Live on Radio TCC — Rubaga Road",
+        category: "Media",
+        date: "2026-07-13"
       }
     ],
     liveStream: {
@@ -298,47 +427,56 @@ const updateChurchDataHandler = (req: express.Request, res: express.Response) =>
 app.post('/api/church-data', updateChurchDataHandler);
 app.put('/api/church-info', updateChurchDataHandler);
 
-// GET all form submissions (For admin only)
+// GET all form submissions (For admin)
 app.get('/api/submissions', (req, res) => {
   try {
-    if (fs.existsSync(SUBMISSIONS_PATH)) {
-      const fileData = fs.readFileSync(SUBMISSIONS_PATH, 'utf-8');
-      return res.json(JSON.parse(fileData));
-    }
-    return res.json([]);
+    return res.json(readSubmissions());
   } catch (error) {
     console.error('Error retrieving submissions:', error);
     res.status(500).json({ error: 'Failed to retrieve submissions' });
   }
 });
 
-// POST a new submission (Seeker/Family join)
+// POST a new submission from /contact → data/submissions.json
 app.post('/api/submissions', (req, res) => {
   try {
-    const newSubmission = req.body;
-    let submissions = [];
-    if (fs.existsSync(SUBMISSIONS_PATH)) {
-      const fileData = fs.readFileSync(SUBMISSIONS_PATH, 'utf-8');
-      submissions = JSON.parse(fileData);
+    const { fullName, phone, email, message, interestArea } = req.body || {};
+
+    if (!fullName || !phone) {
+      return res.status(400).json({ error: 'Full name and phone are required' });
     }
-    submissions.push({
-      ...newSubmission,
+
+    const saved = {
       id: `sub-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-      status: 'New'
+      fullName: String(fullName).trim(),
+      email: email ? String(email).trim() : '',
+      phone: String(phone).trim(),
+      interestArea: interestArea ? String(interestArea).trim() : 'Just Joining as Member',
+      message: message ? String(message).trim() : '',
+      submittedAt: new Date().toISOString(),
+      status: 'New' as const,
+    };
+
+    const submissions = readSubmissions();
+    submissions.unshift(saved);
+    writeSubmissions(submissions);
+
+    res.json({
+      success: true,
+      submission: saved,
+      message: 'Thank you for joining our family! Our leaders will contact you shortly.',
     });
-    fs.writeFileSync(SUBMISSIONS_PATH, JSON.stringify(submissions, null, 2));
-    res.json({ success: true, message: 'Thank you for joining our family! Our leaders will contact you shortly.' });
   } catch (error) {
     console.error('Error writing submission:', error);
     res.status(500).json({ error: 'Failed to process your request' });
   }
 });
 
-// POST to sync all submissions (for Admin panel updating statuses)
+// POST to sync all submissions (admin status updates / deletes)
 app.post('/api/submissions/sync', (req, res) => {
   try {
-    const submissions = req.body;
-    fs.writeFileSync(SUBMISSIONS_PATH, JSON.stringify(submissions, null, 2));
+    const submissions = Array.isArray(req.body) ? req.body : [];
+    writeSubmissions(submissions);
     res.json({ success: true, message: 'Submissions synced successfully' });
   } catch (error) {
     console.error('Error syncing submissions:', error);

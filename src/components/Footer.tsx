@@ -12,8 +12,8 @@ interface FooterProps {
 export default function Footer({ currentTab, setCurrentTab, branches }: FooterProps) {
   return (
     <footer className="bg-slate-950 text-slate-300 border-t border-slate-900 font-sans">
-      <div className="mx-auto max-w-7xl px-4 py-12 md:py-16">
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-4">
+      <div className="mx-auto max-w-7xl px-4 py-8 md:py-10">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4">
           
           {/* Church Brand Block */}
           <div className="space-y-4">

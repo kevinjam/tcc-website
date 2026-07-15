@@ -53,7 +53,7 @@ export default function Header({
               <a href={CHURCH_CONTACT.facebookUrl} target="_blank" rel="noopener noreferrer" className="hover:text-gold-400 transition-colors">Facebook</a>
               <a href="https://www.youtube.com/@tvtcc-ug" target="_blank" rel="noopener noreferrer" className="hover:text-gold-400 transition-colors">YouTube</a>
               <a href="#" className="hover:text-gold-400 transition-colors">Instagram</a>
-              <a href="#" className="hover:text-gold-400 transition-colors">WhatsApp</a>
+              <a href={CHURCH_CONTACT.whatsappChannelUrl} target="_blank" rel="noopener noreferrer" className="hover:text-gold-400 transition-colors">WhatsApp</a>
             </div>
             <button 
               onClick={() => handleTabClick('contact')}

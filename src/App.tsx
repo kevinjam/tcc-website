@@ -205,10 +205,14 @@ export default function App() {
     }
   };
 
-  // ADMIN LOGIN
+  // ADMIN LOGIN — refresh submissions from disk so Family Sign-Ups is current
   const handleLoginAdmin = (pass: string): boolean => {
     if (pass === 'tcc123') {
       setAdminLoggedIn(true);
+      fetch('/api/submissions')
+        .then((r) => (r.ok ? r.json() : []))
+        .then((subs) => setSubmissions(Array.isArray(subs) ? subs : []))
+        .catch(() => {});
       return true;
     }
     return false;
@@ -218,32 +222,29 @@ export default function App() {
     setAdminLoggedIn(false);
   };
 
-  // CONTACT SUBMIT HANDLER
+  // CONTACT SUBMIT → saved to data/submissions.json for /admin
   const handleSubmitContact = async (seeker: { fullName: string; email: string; phone: string; message: string; interestArea: string }): Promise<boolean> => {
     try {
-      const payload: JoinSubmission = {
-        id: `sub-${Date.now()}`,
-        fullName: seeker.fullName,
-        email: seeker.email,
-        phone: seeker.phone,
-        interestArea: seeker.interestArea,
-        message: seeker.message,
-        submittedAt: new Date().toISOString(),
-        status: 'New'
-      };
-
       const res = await fetch('/api/submissions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+          fullName: seeker.fullName,
+          email: seeker.email,
+          phone: seeker.phone,
+          interestArea: seeker.interestArea,
+          message: seeker.message,
+        })
       });
 
-      if (res.ok) {
-        // Optimistically prepend to state
-        setSubmissions(prev => [payload, ...prev]);
-        return true;
+      if (!res.ok) return false;
+
+      const data = await res.json();
+      const saved: JoinSubmission = data.submission;
+      if (saved) {
+        setSubmissions((prev) => [saved, ...prev.filter((s) => s.id !== saved.id)]);
       }
-      return false;
+      return true;
     } catch (err) {
       console.error("Error submitting contact info:", err);
       return false;
@@ -348,7 +349,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-slate-50 font-sans relative">
+    <div className="min-h-screen flex flex-col bg-slate-50 font-sans relative">
       
       {/* 1. CHURCH HEADER NAVIGATION */}
       <Header 
@@ -359,7 +360,7 @@ export default function App() {
       />
       
       {/* 2. DYNAMIC MAIN BODY */}
-      <main className="flex-1">
+      <main className={currentTab === 'contact' ? undefined : 'flex-1'}>
         {renderTabContent()}
       </main>
 

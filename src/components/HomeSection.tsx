@@ -296,10 +296,9 @@ export default function HomeSection({
           <div className="lg:col-span-5 relative">
             <div className="absolute -top-4 -left-4 h-full w-full rounded-2xl border-2 border-gold-500/20 z-0"></div>
             <img 
-              src="https://images.unsplash.com/photo-1438032005730-c779502df39b?q=80&w=1200"
-              alt="Trinity Sanctuary"
-              className="relative z-10 h-[400px] w-full rounded-2xl object-cover shadow-2xl filter brightness-95"
-              referrerPolicy="no-referrer"
+              src="/voice-rubaga.png"
+              alt="The Voice of the Gospel on Rubaga Road"
+              className="relative z-10 h-[400px] w-full rounded-2xl object-cover shadow-2xl"
             />
             <div className="absolute -bottom-6 -right-6 z-20 rounded-xl bg-slate-900 p-4 border border-slate-800 text-white shadow-xl max-w-xs">
               <p className="font-display text-2xl font-bold text-gold-400">104.1 FM</p>
