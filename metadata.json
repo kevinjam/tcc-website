@@ -1,0 +1,6 @@
+{
+  "name": "Trinity Christian Church",
+  "description": "Official website of Trinity Christian Church (TCC) - Voice of the Gospel, Kampala Uganda. Featuring ministries, programs, live stream, and church staff CMS.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
