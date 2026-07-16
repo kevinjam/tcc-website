@@ -23,6 +23,25 @@ import {
   defaultLiveStream,
   initialDevotions,
 } from './initialData';
+import {
+  getStoredChurchInfo,
+  saveStoredChurchInfo,
+  getStoredEvents,
+  saveStoredEvents,
+  getStoredBranches,
+  saveStoredBranches,
+  getStoredPrograms,
+  saveStoredPrograms,
+  getStoredGallery,
+  saveStoredGallery,
+  getStoredLiveStream,
+  saveStoredLiveStream,
+  getStoredDevotions,
+  saveStoredDevotions,
+  getStoredSubmissions,
+  saveStoredSubmissions,
+  resetAllToDefault,
+} from './cmsStore';
 
 const PUBLIC_TABS = ['home', 'about', 'mission', 'branches', 'brigade', 'media', 'contact'] as const;
 
@@ -40,23 +59,18 @@ function pathFromTab(tab: string): string {
   return `/${tab}`;
 }
 
-/** Apply bundled defaults when API is unavailable (e.g. static Vercel deploy). */
-function applyBundledDefaults(setters: {
-  setChurchInfo: (v: ChurchInfo) => void;
-  setEvents: (v: ChurchEvent[]) => void;
-  setBranches: (v: Branch[]) => void;
-  setPrograms: (v: Program[]) => void;
-  setGallery: (v: GalleryItem[]) => void;
-  setLiveStream: (v: LiveStreamConfig) => void;
-  setDevotions: (v: Devotion[]) => void;
-}) {
-  setters.setChurchInfo(bundledChurchInfo);
-  setters.setEvents(initialEvents);
-  setters.setBranches(initialBranches);
-  setters.setPrograms(initialPrograms);
-  setters.setGallery(initialGallery);
-  setters.setLiveStream(defaultLiveStream);
-  setters.setDevotions(initialDevotions);
+/** Load bundled + any browser-saved CMS overrides (for static Vercel deploys). */
+function loadClientDefaults() {
+  return {
+    churchInfo: getStoredChurchInfo(),
+    events: getStoredEvents(),
+    branches: getStoredBranches(),
+    programs: getStoredPrograms(),
+    gallery: getStoredGallery(),
+    liveStream: getStoredLiveStream(),
+    devotions: getStoredDevotions(),
+    submissions: getStoredSubmissions(),
+  };
 }
 
 export default function App() {
@@ -65,16 +79,32 @@ export default function App() {
   );
   const [loading, setLoading] = useState<boolean>(true);
   const [isNotificationOpen, setIsNotificationOpen] = useState<boolean>(false);
-  
-  // Start with bundled data so gallery/branches photos work without the Express API
-  const [churchInfo, setChurchInfo] = useState<ChurchInfo>(bundledChurchInfo);
-  const [events, setEvents] = useState<ChurchEvent[]>(initialEvents);
-  const [branches, setBranches] = useState<Branch[]>(initialBranches);
-  const [programs, setPrograms] = useState<Program[]>(initialPrograms);
-  const [gallery, setGallery] = useState<GalleryItem[]>(initialGallery);
-  const [liveStream, setLiveStream] = useState<LiveStreamConfig>(defaultLiveStream);
-  const [devotions, setDevotions] = useState<Devotion[]>(initialDevotions);
-  const [submissions, setSubmissions] = useState<JoinSubmission[]>([]);
+
+  // Start with bundled / localStorage data so /admin and gallery work without Express
+  const [churchInfo, setChurchInfo] = useState<ChurchInfo>(() =>
+    typeof window !== 'undefined' ? getStoredChurchInfo() : bundledChurchInfo
+  );
+  const [events, setEvents] = useState<ChurchEvent[]>(() =>
+    typeof window !== 'undefined' ? getStoredEvents() : initialEvents
+  );
+  const [branches, setBranches] = useState<Branch[]>(() =>
+    typeof window !== 'undefined' ? getStoredBranches() : initialBranches
+  );
+  const [programs, setPrograms] = useState<Program[]>(() =>
+    typeof window !== 'undefined' ? getStoredPrograms() : initialPrograms
+  );
+  const [gallery, setGallery] = useState<GalleryItem[]>(() =>
+    typeof window !== 'undefined' ? getStoredGallery() : initialGallery
+  );
+  const [liveStream, setLiveStream] = useState<LiveStreamConfig>(() =>
+    typeof window !== 'undefined' ? getStoredLiveStream() : defaultLiveStream
+  );
+  const [devotions, setDevotions] = useState<Devotion[]>(() =>
+    typeof window !== 'undefined' ? getStoredDevotions() : initialDevotions
+  );
+  const [submissions, setSubmissions] = useState<JoinSubmission[]>(() =>
+    typeof window !== 'undefined' ? getStoredSubmissions() : []
+  );
 
   // Admin Portal Auth States
   const [adminLoggedIn, setAdminLoggedIn] = useState<boolean>(false);
@@ -96,7 +126,6 @@ export default function App() {
       setCurrentTabState(tabFromPath(window.location.pathname));
     };
     window.addEventListener('popstate', onPopState);
-    // Normalize URL on first load if needed
     const initialTab = tabFromPath(window.location.pathname);
     const expectedPath = pathFromTab(initialTab);
     if (window.location.pathname !== expectedPath) {
@@ -105,16 +134,26 @@ export default function App() {
     return () => window.removeEventListener('popstate', onPopState);
   }, []);
 
-  // Prefer API when available; fall back to bundled data on static hosts (Vercel)
+  const applyClientDefaults = () => {
+    const d = loadClientDefaults();
+    setChurchInfo(d.churchInfo);
+    setEvents(d.events);
+    setBranches(d.branches);
+    setPrograms(d.programs);
+    setGallery(d.gallery);
+    setLiveStream(d.liveStream);
+    setDevotions(d.devotions);
+    setSubmissions(d.submissions);
+  };
+
+  // Prefer API when available; fall back to bundled + localStorage on static hosts (Vercel)
   const fetchAllData = async () => {
     try {
       setLoading(true);
       const res = await fetch('/api/church-info');
 
       if (!res.ok) {
-        applyBundledDefaults({
-          setChurchInfo, setEvents, setBranches, setPrograms, setGallery, setLiveStream, setDevotions,
-        });
+        applyClientDefaults();
         return;
       }
 
@@ -128,21 +167,19 @@ export default function App() {
         setLiveStream(data.liveStream || defaultLiveStream);
         setDevotions(data.devotions?.length ? data.devotions : initialDevotions);
       } else {
-        applyBundledDefaults({
-          setChurchInfo, setEvents, setBranches, setPrograms, setGallery, setLiveStream, setDevotions,
-        });
+        applyClientDefaults();
       }
 
       const subRes = await fetch('/api/submissions');
       if (subRes.ok) {
         const subData = await subRes.json();
-        setSubmissions(Array.isArray(subData) ? subData : []);
+        setSubmissions(Array.isArray(subData) ? subData : getStoredSubmissions());
+      } else {
+        setSubmissions(getStoredSubmissions());
       }
     } catch (error) {
-      console.error("API unavailable — using bundled church data:", error);
-      applyBundledDefaults({
-        setChurchInfo, setEvents, setBranches, setPrograms, setGallery, setLiveStream, setDevotions,
-      });
+      console.error("API unavailable — using bundled/localStorage church data:", error);
+      applyClientDefaults();
     } finally {
       setLoading(false);
     }
@@ -152,8 +189,24 @@ export default function App() {
     fetchAllData();
   }, []);
 
-  // API SYNC TRIGGER (PUT)
-  const syncWithBackend = async (updatedPayload: any) => {
+  // Persist to API when possible; always mirror to localStorage for static deploys
+  const syncWithBackend = async (updatedPayload: {
+    info: ChurchInfo;
+    events: ChurchEvent[];
+    branches: Branch[];
+    programs: Program[];
+    gallery: GalleryItem[];
+    liveStream: LiveStreamConfig;
+    devotions: Devotion[];
+  }) => {
+    saveStoredChurchInfo(updatedPayload.info);
+    saveStoredEvents(updatedPayload.events);
+    saveStoredBranches(updatedPayload.branches);
+    saveStoredPrograms(updatedPayload.programs);
+    saveStoredGallery(updatedPayload.gallery);
+    saveStoredLiveStream(updatedPayload.liveStream);
+    saveStoredDevotions(updatedPayload.devotions);
+
     try {
       const response = await fetch('/api/church-info', {
         method: 'PUT',
@@ -161,10 +214,10 @@ export default function App() {
         body: JSON.stringify(updatedPayload)
       });
       if (response.ok) {
-        console.log("Database synchronized successfully on filesystem!");
+        // synced to Express when available (local/dev)
       }
     } catch (error) {
-      console.error("Failed to sync state to Express server:", error);
+      console.error("Server sync unavailable — saved to browser storage:", error);
     }
   };
 
@@ -201,6 +254,7 @@ export default function App() {
 
   const handleUpdateSubmissions = async (updatedSubs: JoinSubmission[]) => {
     setSubmissions(updatedSubs);
+    saveStoredSubmissions(updatedSubs);
     try {
       await fetch('/api/submissions/sync', {
         method: 'POST',
@@ -208,30 +262,46 @@ export default function App() {
         body: JSON.stringify(updatedSubs)
       });
     } catch (error) {
-      console.error("Failed to update submissions in file-system:", error);
+      console.error("Failed to update submissions on server — kept in browser storage:", error);
     }
   };
 
   // RESET SYSTEM STATE
   const handleResetToDefaults = async () => {
+    resetAllToDefault();
     try {
       const res = await fetch('/api/reset', { method: 'POST' });
       if (res.ok) {
         fetchAllData();
+        return;
       }
-    } catch (error) {
-      console.error("Error during master reset:", error);
+    } catch {
+      // static host — fall through to client reset
     }
+    setChurchInfo(bundledChurchInfo);
+    setEvents(initialEvents);
+    setBranches(initialBranches);
+    setPrograms(initialPrograms);
+    setGallery(initialGallery);
+    setLiveStream(defaultLiveStream);
+    setDevotions(initialDevotions);
   };
 
-  // ADMIN LOGIN — refresh submissions from disk so Family Sign-Ups is current
+  // ADMIN LOGIN
   const handleLoginAdmin = (pass: string): boolean => {
     if (pass === 'tcc123') {
       setAdminLoggedIn(true);
       fetch('/api/submissions')
-        .then((r) => (r.ok ? r.json() : []))
-        .then((subs) => setSubmissions(Array.isArray(subs) ? subs : []))
-        .catch(() => {});
+        .then((r) => (r.ok ? r.json() : null))
+        .then((subs) => {
+          if (Array.isArray(subs)) {
+            setSubmissions(subs);
+            saveStoredSubmissions(subs);
+          } else {
+            setSubmissions(getStoredSubmissions());
+          }
+        })
+        .catch(() => setSubmissions(getStoredSubmissions()));
       return true;
     }
     return false;
@@ -241,8 +311,19 @@ export default function App() {
     setAdminLoggedIn(false);
   };
 
-  // CONTACT SUBMIT → saved to data/submissions.json for /admin
+  // CONTACT SUBMIT → API when available, else browser storage for /admin
   const handleSubmitContact = async (seeker: { fullName: string; email: string; phone: string; message: string; interestArea: string }): Promise<boolean> => {
+    const localPayload: JoinSubmission = {
+      id: `sub-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      fullName: seeker.fullName,
+      email: seeker.email,
+      phone: seeker.phone,
+      interestArea: seeker.interestArea,
+      message: seeker.message,
+      submittedAt: new Date().toISOString(),
+      status: 'New',
+    };
+
     try {
       const res = await fetch('/api/submissions', {
         method: 'POST',
@@ -256,18 +337,22 @@ export default function App() {
         })
       });
 
-      if (!res.ok) return false;
-
-      const data = await res.json();
-      const saved: JoinSubmission = data.submission;
-      if (saved) {
+      if (res.ok) {
+        const data = await res.json();
+        const saved: JoinSubmission = data.submission || localPayload;
         setSubmissions((prev) => [saved, ...prev.filter((s) => s.id !== saved.id)]);
+        saveStoredSubmissions([saved, ...getStoredSubmissions().filter((s) => s.id !== saved.id)]);
+        return true;
       }
-      return true;
     } catch (err) {
-      console.error("Error submitting contact info:", err);
-      return false;
+      console.error("API submit failed — saving contact locally:", err);
     }
+
+    // Static Vercel fallback
+    const next = [localPayload, ...getStoredSubmissions()];
+    saveStoredSubmissions(next);
+    setSubmissions(next);
+    return true;
   };
 
   // Dynamic body view router
