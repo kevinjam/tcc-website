@@ -301,7 +301,7 @@ export default function HomeSection({
               className="relative z-10 h-[400px] w-full rounded-2xl object-cover shadow-2xl"
             />
             <div className="absolute -bottom-6 -right-6 z-20 rounded-xl bg-slate-900 p-4 border border-slate-800 text-white shadow-xl max-w-xs">
-              <p className="font-display text-2xl font-bold text-gold-400">104.1 FM</p>
+              <p className="font-display text-2xl font-bold text-gold-400">Radio TCC</p>
               <p className="text-xs text-slate-400">Broadcasting Luganda sermons, and local worship daily across Central Uganda.</p>
             </div>
           </div>
