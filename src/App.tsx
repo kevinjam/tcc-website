@@ -14,6 +14,15 @@ import { Bell, X, Calendar, MapPin, Clock } from 'lucide-react';
 import { 
   ChurchInfo, ChurchEvent, Branch, Program, GalleryItem, LiveStreamConfig, JoinSubmission, Devotion 
 } from './types';
+import {
+  churchInfo as bundledChurchInfo,
+  initialEvents,
+  initialBranches,
+  initialPrograms,
+  initialGallery,
+  defaultLiveStream,
+  initialDevotions,
+} from './initialData';
 
 const PUBLIC_TABS = ['home', 'about', 'mission', 'branches', 'brigade', 'media', 'contact'] as const;
 
@@ -31,27 +40,24 @@ function pathFromTab(tab: string): string {
   return `/${tab}`;
 }
 
-// Fallback initial structures to prevent rendering crash before API returns
-const fallbackInfo: ChurchInfo = {
-  aboutText: "Trinity Christian Church is a Prophetic Ministry under Prophet Israel Mukama as the Vision bearer and Pastor Omoding Jacob as the church pastor.",
-  historyText: "The Ministry began with the call of Prophet Israel Mukama on the 28th November 1993.",
-  visionText: "To bring people to know and understand the one True God who has revealed Himself as eternally self-existent: \"I AM\" the Creator of Heaven and Earth and the Redeemer of mankind.",
-  missionText: "To collectively depend on our relationship with Christ and take his love and power to everyone in our communities and the world as a whole: Winning the lost Christians; Building them in faith; Equipping them to minister or serve and multiply to maturity for leadership (Ephesians 1:20-23, Matthew 28:19-20, 2 Timothy 2:2, Ephesians 5:18).",
-  aimsText: [],
-  brigadeBoysText: "Instilling discipline, physical fitness, and professional brass band training...",
-  brigadeGirlsText: "Fostering traditional dance performance, baking, craft skills, and mentorship..."
-};
-
-const fallbackStream: LiveStreamConfig = {
-  isLiveVideo: true,
-  videoUrl: "https://www.youtube.com/embed/videoseries?list=UUQ-P0L_ApCxXLd2oobIBnYA",
-  videoTitle: "TV TCC — Trinity Christian Church",
-  activeSpeaker: "Prophet Israel Mukama",
-  isLiveRadio: true,
-  radioUrl: "http://stream.radiojar.com/3xdv7d8gmbpwv",
-  radioSiteUrl: "https://radio.tccug.org/",
-  radioTitle: "Radio TCC - Voice of the Gospel 24/7"
-};
+/** Apply bundled defaults when API is unavailable (e.g. static Vercel deploy). */
+function applyBundledDefaults(setters: {
+  setChurchInfo: (v: ChurchInfo) => void;
+  setEvents: (v: ChurchEvent[]) => void;
+  setBranches: (v: Branch[]) => void;
+  setPrograms: (v: Program[]) => void;
+  setGallery: (v: GalleryItem[]) => void;
+  setLiveStream: (v: LiveStreamConfig) => void;
+  setDevotions: (v: Devotion[]) => void;
+}) {
+  setters.setChurchInfo(bundledChurchInfo);
+  setters.setEvents(initialEvents);
+  setters.setBranches(initialBranches);
+  setters.setPrograms(initialPrograms);
+  setters.setGallery(initialGallery);
+  setters.setLiveStream(defaultLiveStream);
+  setters.setDevotions(initialDevotions);
+}
 
 export default function App() {
   const [currentTab, setCurrentTabState] = useState<string>(() =>
@@ -60,14 +66,14 @@ export default function App() {
   const [loading, setLoading] = useState<boolean>(true);
   const [isNotificationOpen, setIsNotificationOpen] = useState<boolean>(false);
   
-  // App States (Synced with full-stack server API)
-  const [churchInfo, setChurchInfo] = useState<ChurchInfo>(fallbackInfo);
-  const [events, setEvents] = useState<ChurchEvent[]>([]);
-  const [branches, setBranches] = useState<Branch[]>([]);
-  const [programs, setPrograms] = useState<Program[]>([]);
-  const [gallery, setGallery] = useState<GalleryItem[]>([]);
-  const [liveStream, setLiveStream] = useState<LiveStreamConfig>(fallbackStream);
-  const [devotions, setDevotions] = useState<Devotion[]>([]);
+  // Start with bundled data so gallery/branches photos work without the Express API
+  const [churchInfo, setChurchInfo] = useState<ChurchInfo>(bundledChurchInfo);
+  const [events, setEvents] = useState<ChurchEvent[]>(initialEvents);
+  const [branches, setBranches] = useState<Branch[]>(initialBranches);
+  const [programs, setPrograms] = useState<Program[]>(initialPrograms);
+  const [gallery, setGallery] = useState<GalleryItem[]>(initialGallery);
+  const [liveStream, setLiveStream] = useState<LiveStreamConfig>(defaultLiveStream);
+  const [devotions, setDevotions] = useState<Devotion[]>(initialDevotions);
   const [submissions, setSubmissions] = useState<JoinSubmission[]>([]);
 
   // Admin Portal Auth States
@@ -99,31 +105,44 @@ export default function App() {
     return () => window.removeEventListener('popstate', onPopState);
   }, []);
 
-  // Fetch all initial dataset from local Node server
+  // Prefer API when available; fall back to bundled data on static hosts (Vercel)
   const fetchAllData = async () => {
     try {
       setLoading(true);
       const res = await fetch('/api/church-info');
-      const data = await res.json();
-      
-      if (data) {
-        setChurchInfo(data.info || fallbackInfo);
-        setEvents(data.events || []);
-        setBranches(data.branches || []);
-        setPrograms(data.programs || []);
-        setGallery(data.gallery || []);
-        setLiveStream(data.liveStream || fallbackStream);
-        setDevotions(data.devotions || []);
+
+      if (!res.ok) {
+        applyBundledDefaults({
+          setChurchInfo, setEvents, setBranches, setPrograms, setGallery, setLiveStream, setDevotions,
+        });
+        return;
       }
 
-      // Load seeker submissions separately (protected/staff access)
+      const data = await res.json();
+      if (data && data.info) {
+        setChurchInfo(data.info || bundledChurchInfo);
+        setEvents(data.events?.length ? data.events : initialEvents);
+        setBranches(data.branches?.length ? data.branches : initialBranches);
+        setPrograms(data.programs?.length ? data.programs : initialPrograms);
+        setGallery(data.gallery?.length ? data.gallery : initialGallery);
+        setLiveStream(data.liveStream || defaultLiveStream);
+        setDevotions(data.devotions?.length ? data.devotions : initialDevotions);
+      } else {
+        applyBundledDefaults({
+          setChurchInfo, setEvents, setBranches, setPrograms, setGallery, setLiveStream, setDevotions,
+        });
+      }
+
       const subRes = await fetch('/api/submissions');
       if (subRes.ok) {
         const subData = await subRes.json();
-        setSubmissions(subData || []);
+        setSubmissions(Array.isArray(subData) ? subData : []);
       }
     } catch (error) {
-      console.error("Error communicating with full-stack API server:", error);
+      console.error("API unavailable — using bundled church data:", error);
+      applyBundledDefaults({
+        setChurchInfo, setEvents, setBranches, setPrograms, setGallery, setLiveStream, setDevotions,
+      });
     } finally {
       setLoading(false);
     }
