@@ -9,6 +9,7 @@ interface FooterProps {
   branches: Branch[];
 }
 
+
 export default function Footer({ currentTab, setCurrentTab, branches }: FooterProps) {
   return (
     <footer className="bg-slate-950 text-slate-300 border-t border-slate-900 font-sans">

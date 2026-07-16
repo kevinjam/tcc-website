@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { Play, Pause, Volume2, VolumeX, ArrowRight, Calendar } from 'lucide-react';
-import { ChurchInfo, ChurchEvent, Devotion, LiveStreamConfig } from '../types';
+import { ChurchInfo, ChurchEvent, LiveStreamConfig } from '../types';
 
 interface HomeSectionProps {
   churchInfo: ChurchInfo;
   events: ChurchEvent[];
-  devotions: Devotion[];
   liveStream: LiveStreamConfig;
   setCurrentTab: (tab: string) => void;
 }
@@ -13,7 +12,6 @@ interface HomeSectionProps {
 export default function HomeSection({
   churchInfo,
   events,
-  devotions,
   liveStream,
   setCurrentTab
 }: HomeSectionProps) {
