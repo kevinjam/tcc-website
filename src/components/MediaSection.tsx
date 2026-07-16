@@ -136,7 +136,7 @@ export default function MediaSection({ gallery, liveStream }: MediaSectionProps)
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Radio className="h-5 w-5 text-amber-500" />
-                  <h3 className="font-heading font-bold text-base text-white">Radio TCC 104.1 FM</h3>
+                  <h3 className="font-heading font-bold text-base text-white">Radio TCC</h3>
                 </div>
                 <span className="rounded-full bg-amber-600/20 px-2.5 py-0.5 text-[9px] font-bold text-amber-400 border border-amber-500/30 tracking-widest uppercase">
                   📡 On-Air 24/7

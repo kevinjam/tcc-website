@@ -17,16 +17,13 @@ export default function Footer({ currentTab, setCurrentTab, branches }: FooterPr
           
           {/* Church Brand Block */}
           <div className="space-y-4">
-            <div className="flex items-center space-x-3">
+            <div className="flex flex-col items-start gap-2">
               <img
                 src="/tcc-logo.png"
                 alt="Trinity Christian Church"
-                className="h-14 w-auto object-contain"
+                className="h-16 w-auto object-contain"
               />
-              <div>
-                <h3 className="font-heading font-bold tracking-tight text-white">TRINITY</h3>
-                <p className="text-[10px] uppercase tracking-wider text-gold-400 font-semibold">Voice of the Gospel</p>
-              </div>
+              <p className="text-[10px] uppercase tracking-wider text-gold-400 font-semibold">Voice of the Gospel</p>
             </div>
             
             <p className="text-sm text-slate-400 leading-relaxed">
@@ -171,7 +168,10 @@ export default function Footer({ currentTab, setCurrentTab, branches }: FooterPr
 
         {/* Bottom copyright */}
         <div className="flex flex-col items-center justify-between space-y-4 text-xs text-slate-500 md:flex-row md:space-y-0">
-          <p>&copy; {new Date().getFullYear()} Trinity Christian Church (TCC) Uganda. All rights reserved.</p>
+          <p>
+            &copy; {new Date().getFullYear()} Trinity Christian Church (TCC) Uganda. All rights reserved.{' '}
+            <span className="text-slate-400">Site by joshtechserver</span>
+          </p>
           <div className="flex items-center space-x-4">
             <span className="flex items-center text-slate-600">
               <Radio className="mr-1 h-3 w-3" />

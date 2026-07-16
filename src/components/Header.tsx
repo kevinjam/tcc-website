@@ -77,14 +77,11 @@ export default function Header({
             <img
               src="/tcc-logo.png"
               alt="Trinity Christian Church"
-              className="h-12 w-auto object-contain md:h-14"
+              className="h-14 w-auto object-contain md:h-16"
             />
-            <div className="hidden min-[420px]:block">
-              <h1 className="font-heading text-lg font-bold tracking-tight text-white md:text-xl">
-                TRINITY <span className="text-gold-400">CHRISTIAN CHURCH</span>
-              </h1>
-              <p className="text-[9px] uppercase tracking-widest text-slate-400 font-sans">Voice of the Gospel</p>
-            </div>
+            <p className="hidden sm:block text-[9px] uppercase tracking-widest text-slate-400 font-sans">
+              Voice of the Gospel
+            </p>
           </div>
 
           {/* Desktop Navigation */}

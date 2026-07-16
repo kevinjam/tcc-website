@@ -100,7 +100,7 @@ export default function ContactSection({ onSubmitContact }: ContactSectionProps)
                       required
                       value={formData.fullName}
                       onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                      placeholder="e.g. Kevin Namuli"
+                      placeholder="e.g. Brother Joshua "
                       className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-gold-500 focus:outline-none"
                     />
                   </div>
@@ -111,7 +111,7 @@ export default function ContactSection({ onSubmitContact }: ContactSectionProps)
                       required
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      placeholder="e.g. +256 700 000000"
+                      placeholder="e.g. +256 705519715"
                       className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-gold-500 focus:outline-none"
                     />
                   </div>
@@ -121,7 +121,7 @@ export default function ContactSection({ onSubmitContact }: ContactSectionProps)
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="e.g. kevin@example.com"
+                      placeholder="e.g. luisjoshua2019@gmail.com"
                       className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-gold-500 focus:outline-none"
                     />
                   </div>
