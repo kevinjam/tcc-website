@@ -259,7 +259,6 @@ export default function App() {
           <HomeSection 
             churchInfo={churchInfo} 
             events={events} 
-            devotions={devotions} 
             liveStream={liveStream} 
             setCurrentTab={setCurrentTab} 
           />
@@ -330,7 +329,6 @@ export default function App() {
           <HomeSection 
             churchInfo={churchInfo} 
             events={events} 
-            devotions={devotions} 
             liveStream={liveStream} 
             setCurrentTab={setCurrentTab} 
           />
