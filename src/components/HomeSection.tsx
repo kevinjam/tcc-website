@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Play, Pause, Volume2, VolumeX, ArrowRight, Sparkles, BookOpen, Calendar, Loader2 } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, ArrowRight, Calendar } from 'lucide-react';
 import { ChurchInfo, ChurchEvent, Devotion, LiveStreamConfig } from '../types';
 
 interface HomeSectionProps {
@@ -17,9 +17,6 @@ export default function HomeSection({
   liveStream,
   setCurrentTab
 }: HomeSectionProps) {
-  const [aiTopic, setAiTopic] = useState('Hope & Strength');
-  const [generatingDevotion, setGeneratingDevotion] = useState(false);
-  const [generatedDevotion, setGeneratedDevotion] = useState<Devotion | null>(null);
   const [isVideoMuted, setIsVideoMuted] = useState(true);
   const [isVideoPlaying, setIsVideoPlaying] = useState(true);
 
@@ -36,34 +33,8 @@ export default function HomeSection({
     }
   }, [isVideoPlaying, isVideoMuted]);
 
-  // Pre-determined topics for AI devotion
-  const aiTopics = [
-    'Hope & Strength',
-    'Healing & Deliverance',
-    'Youth & Leadership',
-    'Family Blessings',
-    'Faith in Trials'
-  ];
-
   // Find next featured event
   const featuredEvent = events.find(e => e.isFeatured) || events[0];
-
-  const handleGenerateAiDevotion = async () => {
-    setGeneratingDevotion(true);
-    try {
-      const response = await fetch('/api/gemini/devotion', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic: aiTopic })
-      });
-      const data = await response.json();
-      setGeneratedDevotion(data);
-    } catch (error) {
-      console.error('Error generating AI devotion:', error);
-    } finally {
-      setGeneratingDevotion(false);
-    }
-  };
 
   return (
     <div className="bg-slate-50 text-slate-800 font-sans">
@@ -425,129 +396,6 @@ export default function HomeSection({
             </div>
           </div>
 
-        </div>
-      </section>
-
-      {/* 5. GEMINI AI DAILY WORD DEVOTIONAL */}
-      <section className="bg-slate-950 border-t border-slate-900 py-16 md:py-24 text-white">
-        <div className="mx-auto max-w-4xl px-6">
-          <div className="text-center max-w-2xl mx-auto mb-10 space-y-3">
-            <div className="inline-flex items-center space-x-2 rounded-full bg-gold-500/10 px-3 py-1 text-xs text-gold-400 border border-gold-500/20">
-              <Sparkles className="h-3 w-3 animate-pulse text-gold-400" />
-              <span>AI Biblical Guidance Panel</span>
-            </div>
-            <h2 className="font-heading text-2xl font-bold tracking-tight md:text-3xl text-white">
-              Trinity <span className="text-gold-400">Pastor AI</span> Devotional Generator
-            </h2>
-            <p className="text-slate-400 text-xs leading-relaxed">
-              Facing challenges in faith, family, or health? Select a topic below and let our church AI generate a biblical scripture and customized devotional sermon to encourage you.
-            </p>
-          </div>
-
-          {/* Devotion selection buttons */}
-          <div className="flex flex-wrap justify-center gap-2 mb-8">
-            {aiTopics.map((topic) => (
-              <button
-                key={topic}
-                onClick={() => setAiTopic(topic)}
-                className={`rounded-lg px-4 py-2 text-xs font-bold transition-all ${
-                  aiTopic === topic
-                    ? 'bg-gold-500 text-slate-950 shadow-md'
-                    : 'bg-slate-900 text-slate-300 hover:bg-slate-800'
-                }`}
-              >
-                {topic}
-              </button>
-            ))}
-          </div>
-
-          {/* Generating Loading Block */}
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 md:p-10 relative overflow-hidden shadow-2xl">
-            {generatingDevotion ? (
-              <div className="flex flex-col items-center justify-center py-16 space-y-4">
-                <Loader2 className="h-10 w-10 text-gold-400 animate-spin" />
-                <p className="font-heading font-medium text-slate-300 text-sm">Composing scripture and seeking revelation...</p>
-                <p className="text-[11px] text-slate-500 max-w-xs text-center">Using Gemini 3.5-flash to write a customized sermon reflecting the Trinity Voice of the Gospel values.</p>
-              </div>
-            ) : generatedDevotion ? (
-              <div className="space-y-6 animate-in fade-in duration-500">
-                <div className="flex items-center justify-between">
-                  <span className="rounded-full bg-gold-500/15 px-3 py-1 text-[10px] font-bold text-gold-400 border border-gold-500/30 uppercase tracking-widest">
-                    Custom AI Revelation
-                  </span>
-                  <span className="text-xs text-slate-500 font-mono">Topic: {aiTopic}</span>
-                </div>
-                
-                <div className="border-b border-slate-800 pb-4">
-                  <h3 className="font-display text-2xl font-bold text-white tracking-tight">
-                    {generatedDevotion.title}
-                  </h3>
-                  <div className="mt-2.5 flex items-center text-xs text-gold-400 italic">
-                    <BookOpen className="mr-2 h-4 w-4 shrink-0 text-amber-500" />
-                    <span>Scripture Ref: {generatedDevotion.scripture}</span>
-                  </div>
-                </div>
-
-                <div className="space-y-4 text-slate-300 text-sm leading-relaxed">
-                  {generatedDevotion.content.split("\n\n").map((p, idx) => (
-                    <p key={idx}>{p}</p>
-                  ))}
-                </div>
-
-                <div className="pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-                  <span>Sermon written on: <strong>{new Date().toLocaleDateString()}</strong></span>
-                  <span className="font-heading font-semibold text-slate-300">Signed: {generatedDevotion.author}</span>
-                </div>
-              </div>
-            ) : (
-              // Default pre-loaded pastor's devotion shown
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <span className="rounded-full bg-slate-950 px-3 py-1 text-[10px] font-bold text-slate-400 border border-slate-800 uppercase tracking-widest">
-                    Pastor&apos;s Weekly Word
-                  </span>
-                  <span className="text-xs text-slate-500 font-mono">July 2026</span>
-                </div>
-
-                <div className="border-b border-slate-800 pb-4">
-                  <h3 className="font-display text-2xl font-bold text-white tracking-tight">
-                    {devotions[0]?.title || "The Voice of Deliverance"}
-                  </h3>
-                  <div className="mt-2.5 flex items-center text-xs text-gold-400 italic">
-                    <BookOpen className="mr-2 h-4 w-4 text-amber-500" />
-                    <span>Scripture Ref: {devotions[0]?.scripture || "Luke 4:18-19"}</span>
-                  </div>
-                </div>
-
-                <p className="text-slate-300 text-sm leading-relaxed">
-                  {devotions[0]?.content || "Our theme 'Proclaiming the Word. Transforming Lives. Reaching the world' is not a mere statement, but an active divine call. The Word of God possesses the supernatural power to shift heavy situations, break addictions, and heal sick bodies. Take 5 minutes today to declare scriptures over your family."}
-                </p>
-
-                <div className="pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-                  <span>Author: <strong>{devotions[0]?.author || "Bishop John Mukisa"}</strong></span>
-                  <button
-                    onClick={handleGenerateAiDevotion}
-                    className="flex items-center space-x-1.5 rounded-lg bg-gold-500 px-4 py-2 font-heading font-bold text-slate-950 hover:bg-gold-400 active:scale-95 transition-all"
-                  >
-                    <Sparkles className="h-3.5 w-3.5" />
-                    <span>Get Custom AI Devotion</span>
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {generatedDevotion && (
-              <div className="mt-6 flex justify-end">
-                <button
-                  onClick={handleGenerateAiDevotion}
-                  className="flex items-center space-x-1.5 rounded-lg border border-slate-700 bg-slate-950 py-2 px-4 font-heading text-xs font-bold text-slate-200 hover:border-gold-500 hover:text-gold-400 transition-all active:scale-95"
-                >
-                  <Sparkles className="h-3.5 w-3.5 text-gold-400" />
-                  <span>Try another topic</span>
-                </button>
-              </div>
-            )}
-          </div>
         </div>
       </section>
 

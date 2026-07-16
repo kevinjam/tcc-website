@@ -170,7 +170,7 @@ export default function Footer({ currentTab, setCurrentTab, branches }: FooterPr
         <div className="flex flex-col items-center justify-between space-y-4 text-xs text-slate-500 md:flex-row md:space-y-0">
           <p>
             &copy; {new Date().getFullYear()} Trinity Christian Church (TCC) Uganda. All rights reserved.{' '}
-            <span className="text-slate-400">Design by joshtechserver</span>
+            <span className="text-slate-400">POWERED BY JOSHTECH SERVER</span>
           </p>
           <div className="flex items-center space-x-4">
             <span className="flex items-center text-slate-600">
